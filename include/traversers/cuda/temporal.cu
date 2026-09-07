@@ -296,6 +296,7 @@ auto traverser<evaluator_type, grid_type, average_halo_radius>::fetch_result() -
 #include "../../../src/critters/cuda_instantiations.cuh"
 #include "../../../src/traffic/cuda_instantiations.cuh"
 #include "../../../src/cyclic/cuda_instantiations.cuh"
+#include "../../../src/copy__max_throughput_estimate/cuda_instantiations.cuh"
 
 #undef LINEAR_TEMPORAL_CUDA_TRAVERSER_INSTANTIATIONS
 #undef TILED_TEMPORAL_CUDA_TRAVERSER_INSTANTIATIONS

@@ -1,7 +1,31 @@
 import os
 import sys
+import shutil
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.ticker import MultipleLocator
+
+# --- 0. LaTeX Font Configuration & Fallback Logic ---
+# Check if LaTeX is installed on the system
+def has_latex():
+    # checking for latex and dvipng which are typically needed by matplotlib
+    return shutil.which("latex") is not None and shutil.which("dvipng") is not None
+
+USE_LATEX = has_latex()
+
+if USE_LATEX:
+    print("LaTeX detected! Applying new LaTeX formatting and styles.")
+    plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "serif",
+        "font.serif": ["Computer Modern Roman"],
+    })
+else:
+    print("LaTeX not detected. Falling back to the older legacy style.")
+    plt.rcParams.update({
+        "text.usetex": False
+    })
+
 
 # --- 1. Data Loading ---
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -37,9 +61,6 @@ baseline_linear = {'traverser': 'simple', 'evaluator': 'bit_planes', 'layout': '
 
 baseline_tiled = {'traverser': 'simple', 'evaluator': 'tiled_bit_planes', 'layout': 'tiled_bit_planes'}
 baseline_labels = ['Single Step \nLinear Bit Planes (1x)', 'Single Step \nTiled Bit Planes (1x)']
-
-# baseline_tiled = {'traverser': 'simple', 'evaluator': 'bit_planes', 'layout': 'bit_planes'}
-# baseline_labels = ['Single Step Linear Bit Planes (1x)', 'Single Step Linear Bit Planes (1x)']
 
 one_step_linear = {'traverser': 'simple', 'evaluator': 'bit_planes', 'layout': 'bit_planes'}
 one_step_tiled = {'traverser': 'simple', 'evaluator': 'tiled_bit_planes', 'layout': 'tiled_bit_planes'}
@@ -100,8 +121,8 @@ automaton_names = {
     "traffic": "traffic", "fluid": "fluid", "maze": "maze", "critters": "critters"
 }
 
-# ⚙️ Graph Configuration
-scale = 0.6
+# Graph Configuration (Dynamically merged)
+scale = 0.52 if USE_LATEX else 0.6
 plot_config = {
     'plot_mode': 'subplots',
     'y_axis_mode': 'speedup',
@@ -154,6 +175,31 @@ def plot_incomplete_line(ax, x_data, y_data, **kwargs):
         ax.plot(x_seg, y_seg, marker='.', **{k: v for k, v in kwargs.items() if k != 'label'}, label=label)
         is_first_segment = False
 
+# Helper function to strictly control x-axis ticks and styling based on mode
+def style_x_axis(ax, measured_x):
+    if USE_LATEX:
+        # 1. Main labels: Only show 1, and even numbers (2, 4, 6... 24)
+        main_ticks = [1] + list(np.arange(2, 25, 2))
+        ax.set_xticks(main_ticks)
+        
+        # Keep them horizontal and easy to read (no rotation needed now)
+        ax.set_xticklabels(main_ticks, rotation=0, fontsize=11, color='black')
+        ax.set_xlabel("Temporal Steps")
+        
+        # 2. Main grid lines (for the labeled even numbers)
+        ax.grid(True, axis='both', which='major', linestyle='--', linewidth=0.5)
+        
+        # 3. Minor grid lines (for the odd numbers, including 17)
+        # This draws a very faint line at 17 without cluttering the axis with text
+        ax.xaxis.set_minor_locator(MultipleLocator(1))
+        ax.grid(True, axis='x', which='minor', linestyle=':', linewidth=0.4, alpha=0.5)
+    else:
+        # Fallback to the original legacy styling
+        ax.set_xlabel("Temporal Steps")
+        ax.set_xticks(measured_x)
+        ax.grid(True, which='both', linestyle='--', linewidth=0.5)
+
+
 # --- Plotting Logic ---
 if plot_config['plot_mode'] == 'combined':
     fig, ax = plt.subplots(figsize=plot_config['figure_size'])
@@ -166,10 +212,8 @@ if plot_config['plot_mode'] == 'combined':
         plot_incomplete_line(ax, x_values, y_values['tiled'], color=plot_config['tiled_color'], alpha=0.5, label='Tiled' if is_first_tiled else "")
         is_first_tiled = False
 
-    ax.set_xlabel("Temporal Steps")
+    style_x_axis(ax, x_values)
     ax.set_ylabel(y_axis_label)
-    ax.set_xticks(x_values)
-    ax.grid(True, which='both', linestyle='--', linewidth=0.5)
     ax.legend()
     fig.tight_layout()
     plt.savefig('temporal_scaling_combined.png', dpi=300)
@@ -179,7 +223,13 @@ elif plot_config['plot_mode'] == 'subplots':
     fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=plot_config['figure_size'], sharey=True)
     # fig.suptitle('Effect of Temporal Blocking by Automaton')
 
-    colors = plt.get_cmap('tab10', len(AUTOMATA))
+    try:
+        # Newer matplotlib versions
+        colors = plt.cm.get_cmap('tab10', len(AUTOMATA))
+    except AttributeError:
+        # Older matplotlib fallback
+        colors = plt.get_cmap('tab10', len(AUTOMATA))
+        
     linestyles = ['-', '--', ':', '-.']
     
     automaton_styles = {}
@@ -207,11 +257,10 @@ elif plot_config['plot_mode'] == 'subplots':
                              color=style['color'], 
                              linestyle=style['linestyle'])
 
-# Common styling for both subplots
+    # Common styling for both subplots
     for i, ax in enumerate([ax1, ax2]):
-        ax.set_xlabel("Temporal Steps")
-        ax.set_xticks(x_values)
-        ax.grid(True, which='both', linestyle='--', linewidth=0.5)
+        # Apply the dynamically configured X-axis styling
+        style_x_axis(ax, x_values)
 
         if plot_config['y_axis_mode'] == 'speedup':
             ax.axhline(y=1, color='red', linestyle='--', linewidth=1.2)
@@ -221,15 +270,13 @@ elif plot_config['plot_mode'] == 'subplots':
 
             # Place the text at the left, below the line, with the background
             ax.text(x=x_values[0] + 0.1,  # Position slightly right of the y-axis
-                    y=0.85,                 # Position just below the line (y=1)
+                    y=0.85,               # Position just below the line (y=1)
                     s=baseline_labels[i],
                     color='red',
-                    ha='left',              # Horizontally align to the left
-                    va='top',               # Vertically align to the top
+                    ha='left',            # Horizontally align to the left
+                    va='top',             # Vertically align to the top
                     fontsize=9,
-                    bbox=bbox_props)        # Apply the background box
-
-
+                    bbox=bbox_props)      # Apply the background box
             
     ax1.set_ylabel(y_axis_label)
     ax1.legend()

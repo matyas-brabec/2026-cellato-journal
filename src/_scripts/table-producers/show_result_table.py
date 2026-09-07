@@ -1,5 +1,7 @@
 import os
 import sys
+import re
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from abstractions.table_printer import TablePrinter
 from abstractions.results_abstractions import IMPLEMENTATIONS, BITS_USED, RunResult, CSVLoader
@@ -70,7 +72,11 @@ def main():
             # Create row with automaton name and baseline time
             automaton_name = automaton
             if automaton in BITS_USED:
-                automaton_name += BITS_USED[automaton]
+                tag = BITS_USED[automaton]
+                if not use_colors:
+                    # Strip the tags manually if colors are disabled so the raw string length matches
+                    tag = re.sub(r'<<.*?>>', '', tag)
+                automaton_name += tag
                 
             row = [automaton_name, f"{baseline_time:.4f} ps"]
             
@@ -97,5 +103,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-

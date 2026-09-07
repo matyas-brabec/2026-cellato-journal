@@ -1,6 +1,5 @@
 import re
 
-
 class TablePrinter:
 
     class COLORS:
@@ -57,10 +56,16 @@ class TablePrinter:
             print(self.colorize(row_line) if self.use_colors else row_line)
 
     def format_cell(self, cell, width):
+        cell_str = str(cell)
         # Strip color codes for width calculation
-        clean_text = re.sub(r'<<.*?>>', '', cell)
-        # Left-align the text with correct width
-        return f"{cell:<{width + (len(cell) - len(clean_text))}}"
+        clean_text = re.sub(r'<<.*?>>', '', cell_str)
+        
+        if not self.use_colors:
+            # If colors are disabled, return the clean text to prevent tag leakage
+            return f"{clean_text:<{width}}"
+            
+        # Left-align the text with correct width padding for invisible tags
+        return f"{cell_str:<{width + (len(cell_str) - len(clean_text))}}"
 
     def len_without_color(self, text):
         clean_text = re.sub(r'<<.*?>>', '', str(text))

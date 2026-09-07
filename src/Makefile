@@ -6,6 +6,7 @@ NVCC_CC_BIN = $(shell which $(CXX))
 NVCCFLAGS = -std=$(CXX_STD) -DNDEBUG -Wreorder -Wext-lambda-captures-this -O3 -gencode arch=compute_80,code=sm_80 -gencode arch=compute_90,code=sm_90 -I../include -Wno-deprecated-gpu-targets --expt-relaxed-constexpr -ccbin $(NVCC_CC_BIN) -Xcompiler -std=$(CXX_STD),-Wall,-Wextra,-march=native
 
 CUDA_HOME = /usr/local/cuda
+DEPFLAGS = -MMD -MP
 
 INCLUDE_DIRS = -I../include -I$(CUDA_HOME)/include
 LIB_DIRS = -L$(CUDA_HOME)/lib64
@@ -22,7 +23,7 @@ endif
 SRC_DIR = .
 OBJ_DIR = ../bin
 BIN_DIR = ../bin
-CUDA_DIRS = ../include/evaluators ../include/traversers/cuda ./game_of_life ./excitable ./wire ./fire ./brian ./maze ./fluid ./critters ./traffic ./cyclic
+CUDA_DIRS = ../include/evaluators ../include/traversers/cuda ./game_of_life ./excitable ./wire ./fire ./brian ./maze ./fluid ./critters ./traffic ./cyclic ./copy__max_throughput_estimate
 
 # Source and object files
 MAIN_SRC = $(SRC_DIR)/main.cpp
@@ -56,15 +57,18 @@ directories:
 
 # Add directories dependency to object file creation rules
 $(MAIN_OBJ): $(MAIN_SRC) | directories
-	$(CXX) $(CXXFLAGS) -c $< -o $@ $(INCLUDE_DIRS) $(DEFINES)
+	$(CXX) $(CXXFLAGS) $(DEPFLAGS) -c $< -o $@ $(INCLUDE_DIRS) $(DEFINES)
 
 $(TEST_OBJ): $(TEST_SRC) | directories
-	$(CXX) $(CXXFLAGS) -c $< -o $@ $(INCLUDE_DIRS) $(DEFINES)
+	$(CXX) $(CXXFLAGS) $(DEPFLAGS) -c $< -o $@ $(INCLUDE_DIRS) $(DEFINES)
 
 # Pattern rule for CUDA files with vpath to find them
 vpath %.cu $(CUDA_DIRS)
 $(OBJ_DIR)/%.o: %.cu | directories
-	$(NVCC) $(NVCCFLAGS) -c $< -o $@ $(DEFINES)
+	$(NVCC) $(NVCCFLAGS) $(DEPFLAGS) -c $< -o $@ $(DEFINES)
+
+DEPS = $(MAIN_OBJ:.o=.d) $(TEST_OBJ:.o=.d) $(CUDA_OBJS:.o=.d)
+-include $(DEPS)
 
 # Create separate executables for main app and tests
 $(TARGET): $(MAIN_OBJ) $(CUDA_OBJS)

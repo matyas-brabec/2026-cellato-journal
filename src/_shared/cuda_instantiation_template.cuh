@@ -19,6 +19,7 @@
 #ifdef SIMPLE_CUDA_TRAVERSER_INSTANTIATIONS
 
 // Standard grid with standard evaluator
+#ifndef SKIP_STANDARD_GRID_CUDA_TRAVERSER_INSTANTIATIONS
 #define TRAVERSER_TYPE \
     cellato::traversers::cuda::simple::traverser< \
         cellato::evaluators::standard::evaluator<AUTOMATON_NAMESPACE::config::cell_state, AUTOMATON_NAMESPACE::config::algorithm>, \
@@ -30,6 +31,7 @@ template void TRAVERSER_TYPE::run_kernel<cellato::traversers::cuda::simple::_run
 template void TRAVERSER_TYPE::run_kernel<cellato::traversers::cuda::simple::_run_mode::VERBOSE>(int);
 
 #undef TRAVERSER_TYPE
+#endif
 
 // Bit array grid with simple evaluator (32-bit)
 

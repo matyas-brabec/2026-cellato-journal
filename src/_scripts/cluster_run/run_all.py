@@ -25,6 +25,12 @@ TEMPORAL_STEPS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 17, 18, 20, 22, 24]
 
 
 ALL_AUTOMATA = [
+    "copy--max-throughput-estimate--1-bit",
+    "copy--max-throughput-estimate--2-bit",
+    "copy--max-throughput-estimate--3-bit",
+    "copy--max-throughput-estimate--4-bit",
+    "copy--max-throughput-estimate--5-bit",
+
     "critters",
     "traffic",
     "fluid",
@@ -58,6 +64,12 @@ AUTOMATA_bits = {
     "excitable": 3,
     "fluid": 4,
     "cyclic": 5,
+
+    "copy--max-throughput-estimate--1-bit": 1,
+    "copy--max-throughput-estimate--2-bit": 2,
+    "copy--max-throughput-estimate--3-bit": 3,
+    "copy--max-throughput-estimate--4-bit": 4,
+    "copy--max-throughput-estimate--5-bit": 5,
 }
 
 average_halo_radii = {
@@ -71,6 +83,12 @@ average_halo_radii = {
     "excitable": 1.0,
     "fluid": 1.0,
     "cyclic": 1.0,
+
+    "copy--max-throughput-estimate--1-bit": 1.0,
+    "copy--max-throughput-estimate--2-bit": 1.0,
+    "copy--max-throughput-estimate--3-bit": 1.0,
+    "copy--max-throughput-estimate--4-bit": 1.0,
+    "copy--max-throughput-estimate--5-bit": 1.0,
 }
 
 # max sizes for H100 GPU
@@ -86,6 +104,12 @@ biggest_temporal_tile_size_for_automata = {
         "excitable": 64,
         "fluid": 32,
         "cyclic": 32,
+
+        "copy--max-throughput-estimate--1-bit": 128,
+        "copy--max-throughput-estimate--2-bit": 64,
+        "copy--max-throughput-estimate--3-bit": 64,
+        "copy--max-throughput-estimate--4-bit": 32,
+        "copy--max-throughput-estimate--5-bit": 32,
     },
     64: {
         "game-of-life": 64,
@@ -98,6 +122,12 @@ biggest_temporal_tile_size_for_automata = {
         "excitable": 32,
         "fluid": 16,
         "cyclic": 16,
+
+        "copy--max-throughput-estimate--1-bit": 64,
+        "copy--max-throughput-estimate--2-bit": 32,
+        "copy--max-throughput-estimate--3-bit": 32,
+        "copy--max-throughput-estimate--4-bit": 16,
+        "copy--max-throughput-estimate--5-bit": 16,
     }
 }
 

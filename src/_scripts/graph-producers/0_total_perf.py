@@ -1,7 +1,30 @@
 import os
 import sys
+import shutil
 import matplotlib.pyplot as plt
 import numpy as np
+
+# --- 0. LaTeX Font Configuration & Fallback Logic ---
+# Check if LaTeX is installed on the system
+def has_latex():
+    # checking for latex and dvipng which are typically needed by matplotlib
+    return shutil.which("latex") is not None and shutil.which("dvipng") is not None
+
+USE_LATEX = has_latex()
+
+if USE_LATEX:
+    print("LaTeX detected! Applying new LaTeX formatting and styles.")
+    plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "serif",
+        "font.serif": ["Computer Modern Roman"],
+    })
+else:
+    print("LaTeX not detected. Falling back to the older legacy style.")
+    plt.rcParams.update({
+        "text.usetex": False
+    })
+
 
 # --- 1. Data Loading ---
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -45,6 +68,7 @@ temporal_group = [x for x in size_group if x.is_implementation(temporal_linear) 
 
 bests_by_automaton = {}
 for automaton in AUTOMATA:
+    print(f"Processing automaton: {automaton}")
     baseline_for_automaton = [x for x in baseline_group if x.values.get('automaton') == automaton]
     bit_array_for_automaton = [x for x in bit_array_group if x.values.get('automaton') == automaton]
     bit_planes_for_automaton = [x for x in bit_planes_group if x.values.get('automaton') == automaton]
@@ -71,35 +95,43 @@ automaton_names = {
     "traffic": "traffic", "fluid": "fluid", "maze": "maze", "critters": "critters"
 }
 
-# ⚙️ Graph Configuration
-scale = 0.9
+# Graph Configuration (Dynamically merged)
+scale = 0.8 if USE_LATEX else 0.9
 plot_config = {
     'y_axis_mode': 'speedup',
     'y_axis_scale': 'log', # possible values: 'linear', 'log'
     'figure_size': (16*scale, 6*scale),
-    'bar_width': 0.2,
-    'title': f'Performance Comparison for {size}x{size} Grid',
+    'bar_width': 0.18 if USE_LATEX else 0.2,
+    'title': f'Performance Comparison for ${size}\\times{size}$ Grid' if USE_LATEX else f'Performance Comparison for {size}x{size} Grid',
     'show_baseline_bar': False,
     'show_baseline_line': True,
     'add_data_labels': False,
 
-    # --- FONT SIZE CONTROLS (NEW & IMPROVED) ---
-    'title_fontsize': 20,         # Size of the plot title
-    'axis_label_fontsize': 16,    # Size of the X and Y axis labels
-    'tick_label_fontsize': 14,    # Size of the numbers/names on the axes
-    'legend_fontsize': 14,        # Size of the text in the legend
-    'data_label_fontsize': 10,    # Renamed from 'label_fontsize' for clarity
+    # --- FONT SIZE CONTROLS ---
+    'title_fontsize': 20,
+    'axis_label_fontsize': 16,
+    'tick_label_fontsize': 14,
+    'legend_fontsize': 14,
+    'data_label_fontsize': 10,
 
     'label_use_background': True,
     'label_rotation': 45,
     'label_padding': 3,
+    
+    # Conditionally load colors
     'custom_colors': {
-        'baseline': '#003f5c', 'bit_array': '#1f77b4',
-        'bit_planes': '#2ca02c', 'temporal': '#ff7f0e'
+        'baseline': '#003f5c',
+        'bit_array': '#6baed6' if USE_LATEX else '#1f77b4',
+        'bit_planes': '#74c476' if USE_LATEX else '#2ca02c',
+        'temporal': '#fd8d3c' if USE_LATEX else '#ff7f0e'
     },
+    
+    # Conditionally load hatches
     'bar_hatches': {
-        'baseline': '/', 'bit_array': '\\',
-        'bit_planes': '.', 'temporal': 'o'
+        'baseline': '/',
+        'bit_array': '..' if USE_LATEX else '\\',
+        'bit_planes': '///' if USE_LATEX else '.',
+        'temporal': 'xx' if USE_LATEX else 'o'
     },
     'hatch_density': 0.5
 }
@@ -108,13 +140,19 @@ plot_config = {
 # --- Data Preparation ---
 labels = [automaton_names.get(a, a) for a in AUTOMATA]
 implementations = ['baseline', 'bit_array', 'bit_planes', 'temporal']
-impl_display_names = {'baseline': 'Baseline', 'bit_array': 'Bit-packing', 'bit_planes': 'Bit Planes', 'temporal': 'Temporal'}
+impl_display_names = {
+    'baseline': 'Baseline', 
+    'bit_array': 'Bit-packing', 
+    'bit_planes': 'Bit Planes (Linear)', 
+    'temporal': 'Temporal'
+}
 data = {}
 
 if not plot_config['show_baseline_bar']:
     implementations.remove('baseline')
 for impl in implementations:
     data[impl] = []
+    
 if plot_config['y_axis_mode'] == 'speedup':
     y_axis_label = "Speedup Relative to Baseline"
     for automaton in AUTOMATA:
@@ -127,9 +165,25 @@ else:
         for impl in implementations:
             data[impl].append(bests_by_automaton[automaton][impl])
 
+# --- ADDING GEOMETRIC MEAN ---
+labels.append(r"\textbf{Geo Mean}" if USE_LATEX else "Geo Mean")
+for impl in implementations:
+    # np.exp(np.mean(np.log(array))) is the mathematically stable way to compute Geometric Mean
+    g_mean = np.exp(np.mean(np.log(data[impl])))
+    data[impl].append(g_mean)
+
+# Append "(log scale)" if the config is set to log and using new style
+if plot_config['y_axis_scale'] == 'log' and USE_LATEX:
+    y_axis_label += " (log scale)"
+
 # --- Plotting ---
 fig, ax = plt.subplots(figsize=plot_config['figure_size'])
-x = np.arange(len(labels))
+
+# --- APPLYING THE CUSTOM GAP (or regular spacing for legacy style) ---
+num_automata = len(AUTOMATA)
+gap_size = 0.6 if USE_LATEX else 0.0
+x = np.append(np.arange(num_automata), num_automata + gap_size)
+
 width = plot_config['bar_width']
 num_implementations = len(implementations)
 offsets = np.linspace(-width * (num_implementations - 1) / 2, width * (num_implementations - 1) / 2, num_implementations)
@@ -138,28 +192,48 @@ bar_containers = {}
 for i, impl in enumerate(implementations):
     color = plot_config['custom_colors'].get(impl)
     hatch = plot_config['bar_hatches'].get(impl)
-    if hatch and plot_config.get('hatch_density', 1) < 1:
+    
+    if not USE_LATEX and hatch and plot_config.get('hatch_density', 1) < 1:
         hatch = hatch[0]
-    bars = ax.bar(x + offsets[i], data[impl], width, label=impl_display_names[impl], color=color, hatch=hatch)
+        
+    edgecolor = 'black' if USE_LATEX else None
+    
+    bars = ax.bar(
+        x + offsets[i], 
+        data[impl], 
+        width, 
+        label=impl_display_names[impl], 
+        color=color, 
+        hatch=hatch, 
+        edgecolor=edgecolor
+    )
     bar_containers[impl] = bars
 
 
 # --- Styling and Customization ---
-# Applying the new font sizes from plot_config
 ax.set_ylabel(y_axis_label, fontsize=plot_config['axis_label_fontsize'])
-# ax.set_title(plot_config['title'], fontsize=plot_config['title_fontsize'])
 ax.set_xticks(x)
-# ax.set_xticklabels(labels, rotation=45, ha="right", fontsize=plot_config['tick_label_fontsize'])
 ax.set_xticklabels(labels, fontsize=plot_config['tick_label_fontsize'])
 ax.tick_params(axis='y', labelsize=plot_config['tick_label_fontsize'])
 ax.set_yscale(plot_config['y_axis_scale'])
-ax.grid(axis='y', linestyle='--', alpha=0.7)
+
+# Subtlety of grid based on style mode
+ax.grid(axis='y', linestyle='--', alpha=0.6 if USE_LATEX else 0.7)
+
+# Apply specialized styling if in LaTeX mode
+if USE_LATEX:
+    # Removed top and right plot borders for a cleaner look
+    ax.spines[['top', 'right']].set_visible(False)
+
+    # Add a subtle vertical line to separate individual automata from the Geometric Mean
+    separator_x = (num_automata - 1 + x[-1]) / 2
+    ax.axvline(x=separator_x, color='gray', linestyle=':', alpha=0.5)
 
 if plot_config['show_baseline_line'] and plot_config['y_axis_mode'] == 'speedup':
-    col = 'red'
-    width = 1.4
-    ax.axhline(y=1, color=col, linestyle='--', linewidth=width)
-    ax.plot([], [], color=col, linestyle='--', linewidth=width, label='Baseline Performance (1x)')
+    col = 'red' 
+    line_width = 1.4
+    ax.axhline(y=1, color=col, linestyle='--', linewidth=line_width)
+    ax.plot([], [], color=col, linestyle='--', linewidth=line_width, label='Baseline Performance (1x)')
 
 if plot_config['add_data_labels']:
     bbox_props = dict(boxstyle="round,pad=0.3", fc="white", ec="none", alpha=0.8) if plot_config['label_use_background'] else None

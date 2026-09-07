@@ -1,3 +1,4 @@
+#ifndef SKIP_STANDARD_GRID_CUDA_TRAVERSER_INSTANTIATIONS
 #define TRAVERSER_TYPE \
     cellato::traversers::cuda::spacial_blocking::traverser< \
         cellato::evaluators::standard::evaluator<AUTOMATON_NAMESPACE::config::cell_state, AUTOMATON_NAMESPACE::config::algorithm>, \
@@ -10,3 +11,4 @@ template void TRAVERSER_TYPE::run_kernel<cellato::traversers::cuda::spacial_bloc
 template void TRAVERSER_TYPE::run_kernel<cellato::traversers::cuda::spacial_blocking::_run_mode::VERBOSE>(int);
 
 #undef TRAVERSER_TYPE
+#endif

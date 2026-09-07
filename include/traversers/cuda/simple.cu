@@ -110,5 +110,6 @@ auto  traverser<evaluator_type, grid_type>::fetch_result() -> grid_t {
 #include "../../../src/critters/cuda_instantiations.cuh"
 #include "../../../src/traffic/cuda_instantiations.cuh"
 #include "../../../src/cyclic/cuda_instantiations.cuh"
+#include "../../../src/copy__max_throughput_estimate/cuda_instantiations.cuh"
 
 #undef SIMPLE_CUDA_TRAVERSER_INSTANTIATIONS

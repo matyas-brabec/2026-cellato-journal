@@ -24,6 +24,7 @@
 #include "critters/config.hpp"
 #include "cyclic/config.hpp"
 #include "traffic/config.hpp"
+#include "copy__max_throughput_estimate/config.hpp"
 
 #include "args-parser.hpp"
 
@@ -47,6 +48,20 @@ struct switch_ {
         if (!any_executed) {
             std::cerr << "No suitable test suite found for the given parameters." << std::endl;
         }
+    }
+
+    static void print_all_automata() {
+        std::unordered_map<std::string, bool> automata_printed;
+        (void)std::initializer_list<int>{
+            (automata_printed.emplace(all_test_suites::automaton::name, true).second ? (std::cout << all_test_suites::automaton::name << std::endl, 0) : 0)...
+        };
+
+        std::cout << "Available automata: ";
+        for (const auto& [name, _] : automata_printed) {
+            std::cout << name << " ";
+        }
+
+        std::cout << std::endl;
     }
 
 private:
@@ -73,6 +88,16 @@ private:
                 return run_reference_for_automaton<cyclic::config>(params);
             } else if (params.automaton == "traffic") {
                 return run_reference_for_automaton<traffic::config>(params);
+            } else if (params.automaton == "copy--max-throughput-estimate--1-bit") {
+                return run_reference_for_automaton<copy_max_throughput_estimate::variant<1>::config>(params);
+            } else if (params.automaton == "copy--max-throughput-estimate--2-bit") {
+                return run_reference_for_automaton<copy_max_throughput_estimate::variant<2>::config>(params);
+            } else if (params.automaton == "copy--max-throughput-estimate--3-bit") {
+                return run_reference_for_automaton<copy_max_throughput_estimate::variant<3>::config>(params);
+            } else if (params.automaton == "copy--max-throughput-estimate--4-bit") {
+                return run_reference_for_automaton<copy_max_throughput_estimate::variant<4>::config>(params);
+            } else if (params.automaton == "copy--max-throughput-estimate--5-bit") {
+                return run_reference_for_automaton<copy_max_throughput_estimate::variant<5>::config>(params);
             }
         }
 
@@ -280,6 +305,11 @@ int main(int argc, char* argv[]) {
     using _critters_ = critters::config;
     using _cyclic_ = cyclic::config;
     using _traffic_ = traffic::config;
+    using _copy_max_throughput_estimate__1_ = copy_max_throughput_estimate::variant<1>::config;
+    using _copy_max_throughput_estimate__2_ = copy_max_throughput_estimate::variant<2>::config;
+    using _copy_max_throughput_estimate__3_ = copy_max_throughput_estimate::variant<3>::config;
+    using _copy_max_throughput_estimate__4_ = copy_max_throughput_estimate::variant<4>::config;
+    using _copy_max_throughput_estimate__5_ = copy_max_throughput_estimate::variant<5>::config;
 
     #define cases_for(automaton) \
         test::on_cpu::standard<automaton>, \
@@ -304,7 +334,7 @@ int main(int argc, char* argv[]) {
         test::on_cuda::using_<std::uint32_t>::temporal_linear_bit_planes<automaton>, \
         test::on_cuda::using_<std::uint64_t>::temporal_linear_bit_planes<automaton>
 
-    switch_<
+    using all_impls = switch_<
         cases_for(_game_of_life_),
         cases_for(_fire_),
         cases_for(_wire_),
@@ -314,8 +344,17 @@ int main(int argc, char* argv[]) {
         cases_for(_fluid_),
         cases_for(_critters_),
         cases_for(_cyclic_),
-        cases_for(_traffic_)
-    >::run(params);
+        cases_for(_traffic_),
+        cases_for(_copy_max_throughput_estimate__1_),
+        cases_for(_copy_max_throughput_estimate__2_),
+        cases_for(_copy_max_throughput_estimate__3_),
+        cases_for(_copy_max_throughput_estimate__4_),
+        cases_for(_copy_max_throughput_estimate__5_)
+    >;
+
+    // all_impls::print_all_automata();
+
+    all_impls::run(params);
 
     return 0;
 }

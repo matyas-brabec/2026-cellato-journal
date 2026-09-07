@@ -122,5 +122,6 @@ auto traverser<evaluator_type, grid_type, Y_TILE_SIZE, X_TILE_SIZE>::fetch_resul
 #include "../../../src/critters/cuda_instantiations.cuh"
 #include "../../../src/traffic/cuda_instantiations.cuh"
 #include "../../../src/cyclic/cuda_instantiations.cuh"
+#include "../../../src/copy__max_throughput_estimate/cuda_instantiations.cuh"
 
 #undef SPACIAL_BLOCKING_CUDA_TRAVERSER_INSTANTIATIONS
