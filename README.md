@@ -1,12 +1,19 @@
 # Improving Cellular Automata Performance with Bit-Planes Encoding and Bitwise Vectorization 🔍
 
-[![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE) [![doi](https://img.shields.io/badge/DOI-TODO-blue)](https://doi.org/TODO)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE) [![doi](https://img.shields.io/badge/DOI-10.1016/j.parco.2026.103226-blue)](https://doi.org/10.1016/j.parco.2026.103226)
 
 This repository accompanies the paper titled "Improving Cellular Automata Performance with Bit-Planes Encoding and Bitwise Vectorization":
 
 ```bibtex
-@article{
-  TODO
+@article{brabec2026improving,
+  title = {Improving cellular automata performance with bit-planes encoding and bitwise vectorization},
+  author = {Matyáš Brabec and Jiří Klepl and Martin Kruliš},
+  journal = {Parallel Computing},
+  pages = {103226},
+  year = {2026},
+  issn = {0167-8191},
+  doi = {10.1016/j.parco.2026.103226},
+  keywords = {Cellular automata, Vectorization, Bit-planes, Performance, CUDA}
 }
 ```
 
