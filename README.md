@@ -17,6 +17,8 @@ This repository accompanies the paper titled "Improving Cellular Automata Perfor
 }
 ```
 
+For a ready-to-use implementation of the paper's methods, please refer to [Cellato](https://github.com/ParaCoToUl/cellato). The Cellato repository contains the core library with more detailed documentation and usage examples. This repository focuses on the specific implementations and benchmarks presented in the paper.
+
 ## 🚀 Overview
 
 Cellular automata (CA) are discrete computational models widely used to simulate complex systems through simple, localized rules. While CA are primarily valued for their ability to visualize complex phenomena, certain simulations, such as traffic models or electrical circuits, demand high-performance processing to be practical. Being a special case of stencil computations, CA are well-suited for data parallel models and can benefit from both vectorization and GPU offloading. However, the performance optimization of CA has not been thoroughly explored, leaving many open questions. In this paper, we propose a bit-plane data encoding of CA cell states that enables efficient bitwise vectorization and works well with well-known optimizations like temporal blocking. We implemented 10 different CA using this technique to demonstrate the versatility of our approach and performed extensive evaluation. Furthermore, our implementation took advantage of Cellato abstraction, which allows simple CA rule definitions using C++ templates while abstracting away the complex implementation details. Our approach offers speedup of two orders of magnitude (comparing baseline and optimized CUDA implementations) whilst maintaining code simplicity and ease of use for the end users.
