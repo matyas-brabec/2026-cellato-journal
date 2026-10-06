@@ -9,11 +9,14 @@ This repository accompanies the paper titled "Improving Cellular Automata Perfor
   title = {Improving cellular automata performance with bit-planes encoding and bitwise vectorization},
   author = {Matyáš Brabec and Jiří Klepl and Martin Kruliš},
   journal = {Parallel Computing},
-  pages = {103226},
+  volume = {130},
   year = {2026},
+  month = dec,
+  pages = {103226},
   issn = {0167-8191},
   doi = {10.1016/j.parco.2026.103226},
-  keywords = {Cellular automata, Vectorization, Bit-planes, Performance, CUDA}
+  keywords = {Cellular automata, Vectorization, Bit-planes, Performance, CUDA},
+  url = {https://www.sciencedirect.com/science/article/pii/S016781912600044X}
 }
 ```
 
@@ -61,11 +64,11 @@ Cellular automata (CA) are discrete computational models widely used to simulate
 
 All core headers live in [`include/`](./include/). Key components:
 
-| Component| Header    |
+| Component | Header |
 | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **AST nodes**  | [`include/core/ast.hpp`](./include/core/ast.hpp)    |
-| **Evaluators** | [`include/evaluators/standard.hpp`](./include/evaluators/standard.hpp) • [`bit_array.hpp`](./include/evaluators/bit_array.hpp) • [`bit_planes.hpp`](./include/evaluators/bit_planes.hpp) • [`tiled_bit_planes.hpp`](./include/evaluators/tiled_bit_planes.hpp)|
-| **Memory layouts**   | [`include/memory/standard_grid.hpp`](./include/memory/standard_grid.hpp) • [`bit_array_grid.hpp`](include/memory/bit_array_grid.hpp) • [`bit_planes_grid.hpp`](./include/memory/bit_planes_grid.hpp) • [`tiled_bit_planes_grid.hpp`](./include/memory/tiled_bit_planes_grid.hpp)|
+| **AST nodes**  | [`include/core/ast.hpp`](./include/core/ast.hpp) |
+| **Evaluators** | [`include/evaluators/standard.hpp`](./include/evaluators/standard.hpp) • [`bit_array.hpp`](./include/evaluators/bit_array.hpp) • [`bit_planes.hpp`](./include/evaluators/bit_planes.hpp) • [`tiled_bit_planes.hpp`](./include/evaluators/tiled_bit_planes.hpp) |
+| **Memory layouts**   | [`include/memory/standard_grid.hpp`](./include/memory/standard_grid.hpp) • [`bit_array_grid.hpp`](include/memory/bit_array_grid.hpp) • [`bit_planes_grid.hpp`](./include/memory/bit_planes_grid.hpp) • [`tiled_bit_planes_grid.hpp`](./include/memory/tiled_bit_planes_grid.hpp) |
 | **Traversers (iteration)** | CPU: [`traversers/cpu/simple.hpp`](./traversers/cpu/simple.hpp)<br>CUDA: `traversers/cuda/simple.{hpp,cu}` [.hpp](./include/traversers/cuda/simple.hpp) [.cu](./include/traversers/cuda/simple.cu), `…/temporal.{hpp,cu}` [.hpp](./include/traversers/cuda/temporal.hpp) [.cu](./include/traversers/cuda/temporal.cu) |
 
 ## 📖 Tutorial

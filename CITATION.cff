@@ -1,0 +1,51 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the associated paper."
+title: "Improving Cellular Automata Performance with Bit-Planes Encoding and Bitwise Vectorization"
+abstract: "Cellular automata (CA) are discrete computational models widely used to simulate complex systems through simple, localized rules. While CA are primarily valued for their ability to visualize complex phenomena, certain simulations, such as traffic models or electrical circuits, demand high-performance processing to be practical. Being a special case of stencil computations, CA are well-suited for data parallel models and can benefit from both vectorization and GPU offloading. However, the performance optimization of CA has not been thoroughly explored, leaving many open questions. In this paper, we propose a bit-plane data encoding of CA cell states that enables efficient bitwise vectorization and works well with well-known optimizations like temporal blocking. We implemented 10 different CA using this technique to demonstrate the versatility of our approach and performed extensive evaluation. Furthermore, our implementation took advantage of Cellato abstraction, which allows simple CA rule definitions using C++ templates while abstracting away the complex implementation details. Our approach offers speedup of two orders of magnitude (comparing baseline and optimized CUDA implementations) whilst maintaining code simplicity and ease of use for the end users."
+authors:
+  - family-names: Brabec
+    given-names: Matyáš
+    orcid: "https://orcid.org/0009-0008-4470-2748"
+    affiliation: "Charles University"
+  - family-names: Klepl
+    given-names: Jiří
+    orcid: "https://orcid.org/0000-0002-2231-4073"
+    affiliation: "Charles University"
+  - family-names: Kruliš
+    given-names: Martin
+    orcid: "https://orcid.org/0000-0002-0985-8949"
+    affiliation: "Charles University"
+repository-code: "https://github.com/matyas-brabec/2026-cellato-journal"
+url: "https://github.com/matyas-brabec/2026-cellato-journal"
+license: MIT
+keywords:
+  - "cellular automata"
+  - "vectorization"
+  - "bit-planes"
+  - "performance"
+  - "CUDA"
+  - "GPU"
+preferred-citation:
+  type: article
+  title: "Improving cellular automata performance with bit-planes encoding and bitwise vectorization"
+  authors:
+    - family-names: Brabec
+      given-names: Matyáš
+      orcid: "https://orcid.org/0009-0008-4470-2748"
+      affiliation: "Charles University"
+    - family-names: Klepl
+      given-names: Jiří
+      orcid: "https://orcid.org/0000-0002-2231-4073"
+      affiliation: "Charles University"
+    - family-names: Kruliš
+      given-names: Martin
+      orcid: "https://orcid.org/0000-0002-0985-8949"
+      affiliation: "Charles University"
+  journal: "Parallel Computing"
+  volume: 130
+  year: 2026
+  month: 12
+  pages: "103226"
+  issn: "0167-8191"
+  doi: "10.1016/j.parco.2026.103226"
+  url: "https://www.sciencedirect.com/science/article/pii/S016781912600044X"
